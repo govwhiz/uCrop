@@ -119,8 +119,8 @@ public class SampleActivity extends BaseActivity implements UCropFragment.OnFrag
 //                        minSizePixels + random.nextInt(maxSizePixels - minSizePixels),
 //                        minSizePixels + random.nextInt(maxSizePixels - minSizePixels))));
                 //String stringUri = "content://com.android.providers.media.documents/document/image%3A1327";
-//                String stringUri = "content://media/external/images/media/82555";
-                String stringUri = "content://com.android.providers.media.documents/document/image%3A162";
+                String stringUri = "content://media/external/images/media/82555";
+                //String stringUri = "content://com.android.providers.media.documents/document/image%3A162";
                 String destinationFileName = SAMPLE_CROPPED_IMAGE_NAME;
                 destinationFileName += ".jpg";
                 Uri source = Uri.parse(stringUri);
