@@ -53,6 +53,7 @@ public class TransformImageView extends ImageView {
 
     private String mImageInputPath, mImageOutputPath;
     private ExifInfo mExifInfo;
+    protected int imageWeight, imageHeight;
 
     /**
      * Interface for rotation and scale change notifying.
@@ -287,6 +288,8 @@ public class TransformImageView extends ImageView {
 
         float w = drawable.getIntrinsicWidth();
         float h = drawable.getIntrinsicHeight();
+        imageWeight = (int)w;
+        imageHeight = (int)h;
 
         Log.d(TAG, String.format("Image size: [%d:%d]", (int) w, (int) h));
 
@@ -336,4 +339,11 @@ public class TransformImageView extends ImageView {
         mCurrentImageMatrix.mapPoints(mCurrentImageCenter, mInitialImageCenter);
     }
 
+    public int getImageWeight() {
+        return imageWeight;
+    }
+
+    public int getImageHeight() {
+        return imageHeight;
+    }
 }

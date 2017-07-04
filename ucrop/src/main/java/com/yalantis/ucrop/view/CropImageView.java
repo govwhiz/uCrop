@@ -475,7 +475,7 @@ public class CropImageView extends TransformImageView {
      * @param drawableWidth  - image width
      * @param drawableHeight - image height
      */
-    private void setupInitialImagePosition(float drawableWidth, float drawableHeight) {
+    public void setupInitialImagePosition(float drawableWidth, float drawableHeight) {
         float cropRectWidth = mCropRect.width();
         float cropRectHeight = mCropRect.height();
 
