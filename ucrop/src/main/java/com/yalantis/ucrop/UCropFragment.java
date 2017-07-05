@@ -128,11 +128,12 @@ public class UCropFragment extends Fragment {
     private OnFragmentResultUriListener onFragmentResultUriListener;
 
     private Intent mCropIntent;
-    FrameLayout mWrapperControls;
-    LinearLayout mWrapperStates;
+    private FrameLayout mWrapperControls;
+    private LinearLayout mWrapperStates;
     private static int ANIM_DURATION = 400;
-    ImageView uCropShadow;
-    Toolbar toolbar;
+    private ImageView uCropShadow;
+    private Toolbar toolbar;
+    private boolean isSelectCropButton = false;
 
     //private OnFragmentInteractionListener mListener;
 
@@ -188,7 +189,11 @@ public class UCropFragment extends Fragment {
         setImageData(mCropIntent);
         setInitialState();
         addBlockingView(view);
-        mStateClickListener.onClick(mWrapperStateRotate);
+        mWrapperStateScale.setSelected(false);
+        mOverlayView.setCropGridColor(Color.TRANSPARENT);
+
+        setRotateSetting();
+        //mStateClickListener.onClick(mWrapperStateRotate);
 //        mWrapperStateAspectRatio.setOnClickListener(null);
 //        mWrapperStateRotate.setOnClickListener(null);
 //        mWrapperStateScale.setOnClickListener(null);
@@ -268,6 +273,7 @@ public class UCropFragment extends Fragment {
             mLayoutAspectRatio = (ViewGroup) view.findViewById(R.id.layout_aspect_ratio);
             mLayoutRotate = (ViewGroup) view.findViewById(R.id.layout_rotate_wheel);
             mLayoutScale = (ViewGroup) view.findViewById(R.id.layout_scale_wheel);
+            mLayoutRotate.setVisibility(View.GONE);
             mLayoutScale.setVisibility(View.GONE);
             mWrapperControls = (FrameLayout)view.findViewById(R.id.wrapper_controls);
             mWrapperStates = (LinearLayout)view.findViewById(R.id.wrapper_states);
@@ -416,34 +422,65 @@ public class UCropFragment extends Fragment {
     private final View.OnClickListener mStateClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View v) {
-            if (!v.isSelected()) {
+            //if (!v.isSelected()) {
                 setWidgetState(v.getId());
-            }
+            //}
         }
     };
 
     private void setWidgetState(@IdRes int stateViewId) {
         if (!mShowBottomControls) return;
+        if(stateViewId == R.id.state_scale){
+            if(mWrapperStateScale.isSelected()){
+                //isSelectCropButton = false;
+                mWrapperStateScale.setSelected(false);
+                mOverlayView.setCropGridColor(Color.TRANSPARENT);
+                mOverlayView.invalidate();
+            } else {
+                mWrapperStateScale.setSelected(true);
+                mOverlayView.setCropGridColor(getResources().getColor(R.color.ucrop_color_default_crop_grid));
+                mOverlayView.invalidate();
+            }
 
+        }
         mWrapperStateAspectRatio.setSelected(stateViewId == R.id.state_aspect_ratio);
-        mWrapperStateRotate.setSelected(stateViewId == R.id.state_rotate);
-        mWrapperStateScale.setSelected(stateViewId == R.id.state_scale);
+        //mWrapperStateRotate.setSelected(stateViewId == R.id.state_rotate);
+
 
         mLayoutAspectRatio.setVisibility(stateViewId == R.id.state_aspect_ratio ? View.VISIBLE : View.GONE);
-        mLayoutRotate.setVisibility(stateViewId == R.id.state_rotate ? View.VISIBLE : View.GONE);
-        mWrapperControls.setVisibility(stateViewId == R.id.state_rotate ? View.VISIBLE : View.GONE);
+        //mLayoutRotate.setVisibility(stateViewId == R.id.state_rotate ? View.VISIBLE : View.GONE);
+        //mWrapperControls.setVisibility(stateViewId == R.id.state_rotate ? View.VISIBLE : View.GONE);
  //       mLayoutScale.setVisibility(stateViewId == R.id.state_scale ? View.VISIBLE : View.GONE);
         //mLayoutAspectRatio.setVisibility(View.GONE);
         //mLayoutRotate.setVisibility(View.GONE);
         //mLayoutScale.setVisibility(View.GONE);
 
+//        if (stateViewId == R.id.state_scale) {
+//            setAllowedGestures(2);
+//        } else if (stateViewId == R.id.state_rotate) {
+//            //setAllowedGestures(1);
+//            mWrapperStateScale.setSelected(false);
+//            rotateByAngle(90);
+//        } else {
+//            setAllowedGestures(2);
+//        }
+
         if (stateViewId == R.id.state_scale) {
-            setAllowedGestures(2);
-        } else if (stateViewId == R.id.state_rotate) {
-            //setAllowedGestures(1);
-            setRotateSetting();
+            if(mWrapperStateScale.isSelected()){
+
+                //mOverlayView.setCropGridColor(getResources().getColor(R.color.ucrop_color_default_crop_grid));
+                setAllowedGestures(2);
+            } else {
+
+                setRotateSetting();
+            }
         } else {
-            setAllowedGestures(2);
+            //setAllowedGestures(1);
+            mOverlayView.setCropGridColor(Color.TRANSPARENT);
+            mOverlayView.invalidate();
+            setRotateSetting();
+            mWrapperStateScale.setSelected(false);
+            rotateByAngle(90);
         }
     }
 
