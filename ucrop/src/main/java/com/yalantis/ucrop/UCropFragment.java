@@ -7,6 +7,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Rect;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -53,6 +54,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -133,7 +135,11 @@ public class UCropFragment extends Fragment {
     private static int ANIM_DURATION = 400;
     private ImageView uCropShadow;
     private Toolbar toolbar;
-    private boolean isSelectCropButton = false;
+    private WeakReference<FrameLayout> weakRefContainer;
+    private boolean startShowing;
+    private boolean imageInit;
+    private Rect fromRect;
+    private int imageSize;
 
     //private OnFragmentInteractionListener mListener;
 
@@ -150,11 +156,12 @@ public class UCropFragment extends Fragment {
      * @return A new instance of fragment UCropFragment.
      */
     // TODO: Rename and change types and number of parameters
-    public static UCropFragment newInstance(String param1, String param2) {
+    public static UCropFragment newInstance(FrameLayout fragmentContent, String param1, String param2) {
         UCropFragment fragment = new UCropFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
+        fragment.weakRefContainer = new WeakReference<>(fragmentContent);
         fragment.setArguments(args);
         return fragment;
     }
@@ -172,9 +179,48 @@ public class UCropFragment extends Fragment {
         }
     }
 
+    public void setItem(Rect fromRect) {
+        imageInit = false;
+        this.fromRect = fromRect;
+    }
+
+    public void show() {
+        FrameLayout layout = weakRefContainer.get();
+        startShowing = true;
+        if (layout != null && imageInit) {
+            startShow();
+        }
+    }
+
+    private void startShow(){
+        FrameLayout layout = weakRefContainer.get();
+        if (layout != null) {
+            setupImagePositionOnShow();
+            mGestureCropImageView.animate().start();
+            startShowing = false;
+        }
+    }
+
+    private void setupImagePositionOnShow() {
+        mGestureCropImageView.clearAnimation();
+        mGestureCropImageView.setTranslationX(fromRect.left);
+        mGestureCropImageView.setTranslationY(fromRect.top);
+        mGestureCropImageView.setPivotX(0);
+        mGestureCropImageView.setPivotY(0);
+        mGestureCropImageView.setScaleX((float) fromRect.width() / imageSize);
+        mGestureCropImageView.setScaleY((float) fromRect.height() / imageSize);
+
+        mGestureCropImageView.animate().setDuration(ANIM_DURATION)
+                .translationX(0)
+                .translationY(0)
+                .scaleX(1)
+                .scaleY(1);
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        startShowing = false;
         // Inflate the layout for this fragment
         View view = inflater.inflate(R.layout.ucrop_fragment, container, false);
         mCropIntent = new Intent();
@@ -184,7 +230,7 @@ public class UCropFragment extends Fragment {
         mCropOptionsBundle.putFloat(UCrop.EXTRA_ASPECT_RATIO_X, 1);
         mCropOptionsBundle.putFloat(UCrop.EXTRA_ASPECT_RATIO_Y, 1);
         mCropIntent.putExtras(mCropOptionsBundle);
-
+        imageSize = getResources().getDisplayMetrics().widthPixels;
         setupViews(mCropIntent, view);
         setImageData(mCropIntent);
         setInitialState();
@@ -329,37 +375,7 @@ public class UCropFragment extends Fragment {
 
                 Log.e("click","click");
                 cropAndSaveImage();
-//                imageDone.setVisibility(View.GONE);
-//                imageLoader.setVisibility(View.VISIBLE);
-//                mWrapperControls.setAlpha(1);
-//                mWrapperControls.animate()
-//                        .setDuration(ANIM_DURATION)
-//                        .alpha(0)
-//                        .setStartDelay(100);
-//                mWrapperStates.setAlpha(1);
-//                mWrapperStates.animate()
-//                        .setDuration(ANIM_DURATION)
-//                        .alpha(0)
-//                        .setStartDelay(100);
-//                uCropShadow.setAlpha(1);
-//                uCropShadow.animate()
-//                        .setDuration(ANIM_DURATION)
-//                        .alpha(0)
-//                        .setStartDelay(100);
-//                toolbar.setAlpha(1);
-//                toolbar.animate()
-//                        .setDuration(ANIM_DURATION)
-//                        .alpha(0)
-//                        .setStartDelay(100);
-//
-//                mWrapperControls.animate().start();
-//                mWrapperStates.animate().start();
-//                uCropShadow.animate().start();
-//                toolbar.animate().start();
 
-
-                //cropAndSaveImage();
-                //mGestureCropImageView.setVisibility(View.GONE);
             }
         });
 

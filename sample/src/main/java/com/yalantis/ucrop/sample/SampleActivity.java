@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.Rect;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -119,18 +120,22 @@ public class SampleActivity extends BaseActivity implements UCropFragment.OnFrag
 //                        minSizePixels + random.nextInt(maxSizePixels - minSizePixels),
 //                        minSizePixels + random.nextInt(maxSizePixels - minSizePixels))));
                 //String stringUri = "content://com.android.providers.media.documents/document/image%3A1327";
-                //String stringUri = "content://media/external/images/media/82555";
-                String stringUri = "content://com.android.providers.media.documents/document/image%3A162";
+                String stringUri = "content://media/external/images/media/82555";
+                //String stringUri = "content://com.android.providers.media.documents/document/image%3A162";
                 String destinationFileName = SAMPLE_CROPPED_IMAGE_NAME;
                 destinationFileName += ".jpg";
                 Uri source = Uri.parse(stringUri);
                 Uri destination = Uri.fromFile(new File(getCacheDir(), destinationFileName));
-                fTrans = getSupportFragmentManager().beginTransaction();
+                //fTrans = getSupportFragmentManager().beginTransaction();
 //                uCropFragment = new UCropFragment();
 //                fTrans.add(R.id.frgmCont, uCropFragment);
-                uCropFragment = new UCropFragment().newInstance(source.toString(),destination.toString());
-                fTrans.add(R.id.frgmCont, uCropFragment);
-                fTrans.commit();
+                FrameLayout frameLayout = (FrameLayout)findViewById(R.id.frgmCont);
+                Rect rect = new Rect(8,8,133,148);
+                uCropFragment = new UCropFragment().newInstance(frameLayout, source.toString(),destination.toString());
+                uCropFragment.setItem(rect);
+                uCropFragment.show();
+//                fTrans.add(R.id.frgmCont, uCropFragment);
+//                fTrans.commit();
             }
         });
 
