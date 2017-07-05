@@ -1,8 +1,11 @@
 package com.yalantis.ucrop;
 
+import android.animation.Animator;
+import android.animation.AnimatorListenerAdapter;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
@@ -13,7 +16,6 @@ import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
 import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
-import android.support.graphics.drawable.VectorDrawableCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
@@ -47,6 +49,8 @@ import com.yalantis.ucrop.view.UCropView;
 import com.yalantis.ucrop.view.widget.AspectRatioTextView;
 import com.yalantis.ucrop.view.widget.HorizontalProgressWheelView;
 
+import java.io.FileNotFoundException;
+import java.io.InputStream;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.util.ArrayList;
@@ -124,6 +128,11 @@ public class UCropFragment extends Fragment {
     private OnFragmentResultUriListener onFragmentResultUriListener;
 
     private Intent mCropIntent;
+    FrameLayout mWrapperControls;
+    LinearLayout mWrapperStates;
+    private static int ANIM_DURATION = 400;
+    ImageView uCropShadow;
+    Toolbar toolbar;
 
     //private OnFragmentInteractionListener mListener;
 
@@ -259,6 +268,11 @@ public class UCropFragment extends Fragment {
             mLayoutAspectRatio = (ViewGroup) view.findViewById(R.id.layout_aspect_ratio);
             mLayoutRotate = (ViewGroup) view.findViewById(R.id.layout_rotate_wheel);
             mLayoutScale = (ViewGroup) view.findViewById(R.id.layout_scale_wheel);
+            mLayoutScale.setVisibility(View.GONE);
+            mWrapperControls = (FrameLayout)view.findViewById(R.id.wrapper_controls);
+            mWrapperStates = (LinearLayout)view.findViewById(R.id.wrapper_states);
+            mWrapperControls.setVisibility(View.GONE);
+            uCropShadow = (ImageView)view.findViewById(R.id.ucrop_shadow);
 
             setupAspectRatioWidget(intent, view);
             setupRotateWidget(view);
@@ -271,7 +285,7 @@ public class UCropFragment extends Fragment {
     private void setupAppBar(View view) {
         //setStatusBarColor(mStatusBarColor);
 
-        final Toolbar toolbar = (Toolbar) view.findViewById(R.id.toolbar);
+        toolbar = (Toolbar) view.findViewById(R.id.toolbar);
 
         // Set all of the Toolbar coloring
         toolbar.setBackgroundColor(mToolbarColor);
@@ -281,74 +295,102 @@ public class UCropFragment extends Fragment {
         toolbarTitle.setTextColor(mToolbarWidgetColor);
         toolbarTitle.setText(mToolbarTitle);
 
-        final ImageView imageDone = (ImageView) view.findViewById(R.id.image_done);
-        Drawable ic_done = getResources().getDrawable( R.drawable.ucrop_ic_done);
-        if (ic_done != null) {
-            ic_done.mutate();
-            ic_done.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
-            imageDone.setImageDrawable(ic_done);
-        }
-
-        final ImageView imageLoader = (ImageView) view.findViewById(R.id.image_load);
-        Drawable ic_load = getResources().getDrawable( R.drawable.ucrop_vector_loader_animated);
-        if (ic_load != null) {
-            try {
-                ic_load.mutate();
-                ic_load.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
-                imageLoader.setImageDrawable(ic_load);
-            } catch (IllegalStateException e) {
-                Log.i(TAG, String.format("%s - %s", e.getMessage(), getString(R.string.ucrop_mutate_exception_hint)));
-            }
-            ((Animatable) ic_load).start();
-            imageLoader.setVisibility(View.GONE);
-        }
-
-        imageDone.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                imageDone.setVisibility(View.GONE);
-                imageLoader.setVisibility(View.VISIBLE);
-                cropAndSaveImage();
-            }
-        });
-
-        // Color buttons inside the Toolbar
-//        Drawable stateButtonDrawable = ContextCompat.getDrawable(getContext(), mToolbarCancelDrawable).mutate();
-//        stateButtonDrawable.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
-//        toolbar.setNavigationIcon(stateButtonDrawable);
-
-//        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-//        final ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-//        if (actionBar != null) {
-//            actionBar.setDisplayShowTitleEnabled(false);
+//        final ImageView imageDone = (ImageView) view.findViewById(R.id.image_done);
+//        Drawable ic_done = getResources().getDrawable( R.drawable.ucrop_ic_done);
+//        if (ic_done != null) {
+//            ic_done.mutate();
+//            ic_done.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
+//            imageDone.setImageDrawable(ic_done);
 //        }
-    }
-
-//    @Override
-//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-//        inflater.inflate(R.menu.ucrop_menu_activity, menu);
-//        MenuItem menuItemLoader = menu.findItem(R.id.menu_loader);
-//        Drawable menuItemLoaderIcon = menuItemLoader.getIcon();
-//        if (menuItemLoaderIcon != null) {
+//
+//        final ImageView imageLoader = (ImageView) view.findViewById(R.id.image_load);
+//        Drawable ic_load = getResources().getDrawable( R.drawable.ucrop_vector_loader_animated);
+//        if (ic_load != null) {
 //            try {
-//                menuItemLoaderIcon.mutate();
-//                menuItemLoaderIcon.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
-//                menuItemLoader.setIcon(menuItemLoaderIcon);
+//                ic_load.mutate();
+//                ic_load.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
+//                imageLoader.setImageDrawable(ic_load);
 //            } catch (IllegalStateException e) {
 //                Log.i(TAG, String.format("%s - %s", e.getMessage(), getString(R.string.ucrop_mutate_exception_hint)));
 //            }
-//            ((Animatable) menuItemLoader.getIcon()).start();
+//            ((Animatable) ic_load).start();
+//            imageLoader.setVisibility(View.GONE);
 //        }
 //
-//        MenuItem menuItemCrop = menu.findItem(R.id.menu_crop);
-//        Drawable menuItemCropIcon = ContextCompat.getDrawable(getContext(), mToolbarCropDrawable);
-//        if (menuItemCropIcon != null) {
-//            menuItemCropIcon.mutate();
-//            menuItemCropIcon.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
-//            menuItemCrop.setIcon(menuItemCropIcon);
-//        }
-//        super.onCreateOptionsMenu(menu,inflater);
-//    }
+//        imageDone.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+////                imageDone.setVisibility(View.GONE);
+////                imageLoader.setVisibility(View.VISIBLE);
+////                mWrapperControls.setAlpha(1);
+////                mWrapperControls.animate()
+////                        .setDuration(ANIM_DURATION)
+////                        .alpha(0)
+////                        .setStartDelay(100);
+////                mWrapperStates.setAlpha(1);
+////                mWrapperStates.animate()
+////                        .setDuration(ANIM_DURATION)
+////                        .alpha(0)
+////                        .setStartDelay(100);
+////                uCropShadow.setAlpha(1);
+////                uCropShadow.animate()
+////                        .setDuration(ANIM_DURATION)
+////                        .alpha(0)
+////                        .setStartDelay(100);
+////                toolbar.setAlpha(1);
+////                toolbar.animate()
+////                        .setDuration(ANIM_DURATION)
+////                        .alpha(0)
+////                        .setStartDelay(100);
+////
+////                mWrapperControls.animate().start();
+////                mWrapperStates.animate().start();
+////                uCropShadow.animate().start();
+////                toolbar.animate().start();
+//
+//
+//                //cropAndSaveImage();
+//                //mGestureCropImageView.setVisibility(View.GONE);
+//            }
+//        });
+
+         //Color buttons inside the Toolbar
+        Drawable stateButtonDrawable = ContextCompat.getDrawable(getContext(), mToolbarCancelDrawable).mutate();
+        stateButtonDrawable.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
+        toolbar.setNavigationIcon(stateButtonDrawable);
+
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+        final ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(false);
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        inflater.inflate(R.menu.ucrop_menu_activity, menu);
+        MenuItem menuItemLoader = menu.findItem(R.id.menu_loader);
+        Drawable menuItemLoaderIcon = menuItemLoader.getIcon();
+        if (menuItemLoaderIcon != null) {
+            try {
+                menuItemLoaderIcon.mutate();
+                menuItemLoaderIcon.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
+                menuItemLoader.setIcon(menuItemLoaderIcon);
+            } catch (IllegalStateException e) {
+                Log.i(TAG, String.format("%s - %s", e.getMessage(), getString(R.string.ucrop_mutate_exception_hint)));
+            }
+            ((Animatable) menuItemLoader.getIcon()).start();
+        }
+
+        MenuItem menuItemCrop = menu.findItem(R.id.menu_crop);
+        Drawable menuItemCropIcon = ContextCompat.getDrawable(getContext(), mToolbarCropDrawable);
+        if (menuItemCropIcon != null) {
+            menuItemCropIcon.mutate();
+            menuItemCropIcon.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
+            menuItemCrop.setIcon(menuItemCropIcon);
+        }
+        super.onCreateOptionsMenu(menu,inflater);
+    }
 
 
 
@@ -361,14 +403,15 @@ public class UCropFragment extends Fragment {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.menu_crop) {
+
+
+
             cropAndSaveImage();
         } else if (item.getItemId() == android.R.id.home) {
             //onBackPressed();
         }
         return super.onOptionsItemSelected(item);
     }
-
-
 
     private final View.OnClickListener mStateClickListener = new View.OnClickListener() {
         @Override
@@ -388,15 +431,17 @@ public class UCropFragment extends Fragment {
 
         mLayoutAspectRatio.setVisibility(stateViewId == R.id.state_aspect_ratio ? View.VISIBLE : View.GONE);
         mLayoutRotate.setVisibility(stateViewId == R.id.state_rotate ? View.VISIBLE : View.GONE);
-        mLayoutScale.setVisibility(stateViewId == R.id.state_scale ? View.VISIBLE : View.GONE);
+        mWrapperControls.setVisibility(stateViewId == R.id.state_rotate ? View.VISIBLE : View.GONE);
+ //       mLayoutScale.setVisibility(stateViewId == R.id.state_scale ? View.VISIBLE : View.GONE);
         //mLayoutAspectRatio.setVisibility(View.GONE);
         //mLayoutRotate.setVisibility(View.GONE);
         //mLayoutScale.setVisibility(View.GONE);
 
         if (stateViewId == R.id.state_scale) {
-            setAllowedGestures(0);
+            setAllowedGestures(2);
         } else if (stateViewId == R.id.state_rotate) {
-            setAllowedGestures(1);
+            //setAllowedGestures(1);
+            setRotateSetting();
         } else {
             setAllowedGestures(2);
         }
@@ -405,6 +450,11 @@ public class UCropFragment extends Fragment {
     private void setAllowedGestures(int tab) {
         mGestureCropImageView.setScaleEnabled(mAllowedGestures[tab] == ALL || mAllowedGestures[tab] == SCALE);
         mGestureCropImageView.setRotateEnabled(mAllowedGestures[tab] == ALL || mAllowedGestures[tab] == ROTATE);
+    }
+
+    private void setRotateSetting(){
+        mGestureCropImageView.setScaleEnabled(false);
+        mGestureCropImageView.setRotateEnabled(false);
     }
 
     private void setupAspectRatioWidget(@NonNull Intent intent, View view) {
@@ -546,7 +596,8 @@ public class UCropFragment extends Fragment {
         ImageView stateRotateImageView = (ImageView) view.findViewById(R.id.image_view_state_rotate);
         ImageView stateAspectRatioImageView = (ImageView) view.findViewById(R.id.image_view_state_aspect_ratio);
 
-        stateScaleImageView.setImageDrawable(new SelectedStateListDrawable(stateScaleImageView.getDrawable(), mActiveWidgetColor));
+        //stateScaleImageView.setImageDrawable(new SelectedStateListDrawable(stateScaleImageView.getDrawable(), mActiveWidgetColor));
+        stateScaleImageView.setImageDrawable(new SelectedStateListDrawable(stateAspectRatioImageView.getDrawable(), mActiveWidgetColor));
         stateRotateImageView.setImageDrawable(new SelectedStateListDrawable(stateRotateImageView.getDrawable(), mActiveWidgetColor));
         stateAspectRatioImageView.setImageDrawable(new SelectedStateListDrawable(stateAspectRatioImageView.getDrawable(), mActiveWidgetColor));
         //stateScaleImageView.setVisibility(View.GONE);
