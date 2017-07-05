@@ -301,14 +301,14 @@ public class UCropFragment extends Fragment {
         toolbarTitle.setTextColor(mToolbarWidgetColor);
         toolbarTitle.setText(mToolbarTitle);
 
-//        final ImageView imageDone = (ImageView) view.findViewById(R.id.image_done);
-//        Drawable ic_done = getResources().getDrawable( R.drawable.ucrop_ic_done);
-//        if (ic_done != null) {
-//            ic_done.mutate();
-//            ic_done.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
-//            imageDone.setImageDrawable(ic_done);
-//        }
-//
+        final ImageView imageDone = (ImageView) view.findViewById(R.id.image_done);
+        Drawable ic_done = getResources().getDrawable( R.drawable.ucrop_ic_done);
+        if (ic_done != null) {
+            ic_done.mutate();
+            ic_done.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
+            imageDone.setImageDrawable(ic_done);
+        }
+
 //        final ImageView imageLoader = (ImageView) view.findViewById(R.id.image_load);
 //        Drawable ic_load = getResources().getDrawable( R.drawable.ucrop_vector_loader_animated);
 //        if (ic_load != null) {
@@ -322,81 +322,84 @@ public class UCropFragment extends Fragment {
 //            ((Animatable) ic_load).start();
 //            imageLoader.setVisibility(View.GONE);
 //        }
+
+        imageDone.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Log.e("click","click");
+                cropAndSaveImage();
+//                imageDone.setVisibility(View.GONE);
+//                imageLoader.setVisibility(View.VISIBLE);
+//                mWrapperControls.setAlpha(1);
+//                mWrapperControls.animate()
+//                        .setDuration(ANIM_DURATION)
+//                        .alpha(0)
+//                        .setStartDelay(100);
+//                mWrapperStates.setAlpha(1);
+//                mWrapperStates.animate()
+//                        .setDuration(ANIM_DURATION)
+//                        .alpha(0)
+//                        .setStartDelay(100);
+//                uCropShadow.setAlpha(1);
+//                uCropShadow.animate()
+//                        .setDuration(ANIM_DURATION)
+//                        .alpha(0)
+//                        .setStartDelay(100);
+//                toolbar.setAlpha(1);
+//                toolbar.animate()
+//                        .setDuration(ANIM_DURATION)
+//                        .alpha(0)
+//                        .setStartDelay(100);
 //
-//        imageDone.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-////                imageDone.setVisibility(View.GONE);
-////                imageLoader.setVisibility(View.VISIBLE);
-////                mWrapperControls.setAlpha(1);
-////                mWrapperControls.animate()
-////                        .setDuration(ANIM_DURATION)
-////                        .alpha(0)
-////                        .setStartDelay(100);
-////                mWrapperStates.setAlpha(1);
-////                mWrapperStates.animate()
-////                        .setDuration(ANIM_DURATION)
-////                        .alpha(0)
-////                        .setStartDelay(100);
-////                uCropShadow.setAlpha(1);
-////                uCropShadow.animate()
-////                        .setDuration(ANIM_DURATION)
-////                        .alpha(0)
-////                        .setStartDelay(100);
-////                toolbar.setAlpha(1);
-////                toolbar.animate()
-////                        .setDuration(ANIM_DURATION)
-////                        .alpha(0)
-////                        .setStartDelay(100);
-////
-////                mWrapperControls.animate().start();
-////                mWrapperStates.animate().start();
-////                uCropShadow.animate().start();
-////                toolbar.animate().start();
-//
-//
-//                //cropAndSaveImage();
-//                //mGestureCropImageView.setVisibility(View.GONE);
-//            }
-//        });
+//                mWrapperControls.animate().start();
+//                mWrapperStates.animate().start();
+//                uCropShadow.animate().start();
+//                toolbar.animate().start();
+
+
+                //cropAndSaveImage();
+                //mGestureCropImageView.setVisibility(View.GONE);
+            }
+        });
 
          //Color buttons inside the Toolbar
-        Drawable stateButtonDrawable = ContextCompat.getDrawable(getContext(), mToolbarCancelDrawable).mutate();
-        stateButtonDrawable.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
-        toolbar.setNavigationIcon(stateButtonDrawable);
-
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-        final ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
-        }
+//        Drawable stateButtonDrawable = ContextCompat.getDrawable(getContext(), mToolbarCancelDrawable).mutate();
+//        stateButtonDrawable.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
+//        toolbar.setNavigationIcon(stateButtonDrawable);
+//
+//        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+//        final ActionBar actionBar = ((AppCompatActivity)getActivity()).getSupportActionBar();
+//        if (actionBar != null) {
+//            actionBar.setDisplayShowTitleEnabled(false);
+//        }
     }
 
-    @Override
-    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.ucrop_menu_activity, menu);
-        MenuItem menuItemLoader = menu.findItem(R.id.menu_loader);
-        Drawable menuItemLoaderIcon = menuItemLoader.getIcon();
-        if (menuItemLoaderIcon != null) {
-            try {
-                menuItemLoaderIcon.mutate();
-                menuItemLoaderIcon.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
-                menuItemLoader.setIcon(menuItemLoaderIcon);
-            } catch (IllegalStateException e) {
-                Log.i(TAG, String.format("%s - %s", e.getMessage(), getString(R.string.ucrop_mutate_exception_hint)));
-            }
-            ((Animatable) menuItemLoader.getIcon()).start();
-        }
-
-        MenuItem menuItemCrop = menu.findItem(R.id.menu_crop);
-        Drawable menuItemCropIcon = ContextCompat.getDrawable(getContext(), mToolbarCropDrawable);
-        if (menuItemCropIcon != null) {
-            menuItemCropIcon.mutate();
-            menuItemCropIcon.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
-            menuItemCrop.setIcon(menuItemCropIcon);
-        }
-        super.onCreateOptionsMenu(menu,inflater);
-    }
+//    @Override
+//    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+//        inflater.inflate(R.menu.ucrop_menu_activity, menu);
+//        MenuItem menuItemLoader = menu.findItem(R.id.menu_loader);
+//        Drawable menuItemLoaderIcon = menuItemLoader.getIcon();
+//        if (menuItemLoaderIcon != null) {
+//            try {
+//                menuItemLoaderIcon.mutate();
+//                menuItemLoaderIcon.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
+//                menuItemLoader.setIcon(menuItemLoaderIcon);
+//            } catch (IllegalStateException e) {
+//                Log.i(TAG, String.format("%s - %s", e.getMessage(), getString(R.string.ucrop_mutate_exception_hint)));
+//            }
+//            ((Animatable) menuItemLoader.getIcon()).start();
+//        }
+//
+//        MenuItem menuItemCrop = menu.findItem(R.id.menu_crop);
+//        Drawable menuItemCropIcon = ContextCompat.getDrawable(getContext(), mToolbarCropDrawable);
+//        if (menuItemCropIcon != null) {
+//            menuItemCropIcon.mutate();
+//            menuItemCropIcon.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
+//            menuItemCrop.setIcon(menuItemCropIcon);
+//        }
+//        super.onCreateOptionsMenu(menu,inflater);
+//    }
 
 
 

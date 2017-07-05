@@ -13,6 +13,13 @@
         android:background="@color/ucrop_color_toolbar"
         android:minHeight="?attr/actionBarSize">
 
+        <ImageView
+            android:id="@+id/image_cencel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+            android:src="@drawable/ucrop_ic_cross"/>
+
         <TextView
             android:id="@+id/toolbar_title"
             style="@style/TextAppearance.Widget.AppCompat.Toolbar.Title"
@@ -21,6 +28,14 @@
             android:layout_gravity="center"
             android:text="@string/ucrop_label_edit_photo"
             android:textColor="@color/ucrop_color_toolbar_widget"/>
+
+        <ImageView
+            android:id="@+id/image_done"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="10dp"
+            android:layout_gravity="right"
+            android:src="@drawable/ucrop_ic_done"/>
 
 
 
