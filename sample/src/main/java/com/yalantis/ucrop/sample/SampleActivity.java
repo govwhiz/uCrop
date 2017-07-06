@@ -56,6 +56,7 @@ public class SampleActivity extends BaseActivity implements UCropFragment.OnFrag
 //    private CheckBox mCheckBoxFreeStyleCrop;
     private UCropFragment uCropFragment;
     FragmentTransaction fTrans;
+    FrameLayout frameLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +64,7 @@ public class SampleActivity extends BaseActivity implements UCropFragment.OnFrag
         setContentView(R.layout.activity_sample);
 
         fTrans = getSupportFragmentManager().beginTransaction();
-        FrameLayout frameLayout = (FrameLayout)findViewById(R.id.frgmCont);
+        frameLayout = (FrameLayout)findViewById(R.id.frgmCont);
         uCropFragment = new UCropFragment().newInstance(frameLayout);
         fTrans.replace(R.id.frgmCont, uCropFragment);
         fTrans.commit();
@@ -135,7 +136,7 @@ public class SampleActivity extends BaseActivity implements UCropFragment.OnFrag
 //                fTrans.commit();
 
                 Rect rect = new Rect(8,8,133,148);
-                String stringUri = "content://com.android.providers.media.documents/document/image%3A162";
+                String stringUri = "content://media/external/images/media/82555";
                 String destinationFileName = SAMPLE_CROPPED_IMAGE_NAME;
                 destinationFileName += ".jpg";
                 Uri source = Uri.parse(stringUri);
@@ -413,14 +414,22 @@ public class SampleActivity extends BaseActivity implements UCropFragment.OnFrag
     @Override
     public void setResultUri(final int resultCode, final Intent data) {
         //Toast.makeText(this,str,Toast.LENGTH_LONG).show();
-
-
-        final Uri resultUri = UCrop.getOutput(data);
-        if (resultUri != null) {
-            //ResultActivity.startWithUri(SampleActivity.this, resultUri);
-            Log.e("qwe","get result");
-        } else {
-            Toast.makeText(SampleActivity.this, R.string.toast_cannot_retrieve_cropped_image, Toast.LENGTH_SHORT).show();
+        Log.e("resultCode",resultCode+"");
+        if(resultCode == RESULT_OK){
+            final Uri resultUri = UCrop.getOutput(data);
+            if (resultUri != null) {
+                //ResultActivity.startWithUri(SampleActivity.this, resultUri);
+            } else {
+                Toast.makeText(SampleActivity.this, R.string.toast_cannot_retrieve_cropped_image, Toast.LENGTH_SHORT).show();
+            }
         }
+        if(resultCode == RESULT_CANCELED){
+            fTrans = getSupportFragmentManager().beginTransaction();
+            uCropFragment = new UCropFragment().newInstance(frameLayout);
+            fTrans.replace(R.id.frgmCont, uCropFragment);
+            fTrans.commit();
+        }
+
+
     }
 }

@@ -62,6 +62,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 
@@ -241,108 +242,108 @@ public class UCropFragment extends Fragment {
         }
     }
 
-    private void setupImagePositionOnShow() {
-        mGestureCropImageView.clearAnimation();
-        mGestureCropImageView.setTranslationX(fromRect.left);
-        mGestureCropImageView.setTranslationY(fromRect.top);
-        mGestureCropImageView.setPivotX(0);
-        mGestureCropImageView.setPivotY(0);
-        mGestureCropImageView.setScaleX((float) fromRect.width() / imageSize);
-        mGestureCropImageView.setScaleY((float) fromRect.height() / imageSize);
-
-        mGestureCropImageView.animate().setDuration(ANIM_DURATION)
-                .translationX(0)
-                .translationY(0)
-                .scaleX(1)
-                .scaleY(1);
-    }
-
     private void setupImagePositionOnHide() {
-        mGestureCropImageView.clearAnimation();
-        mGestureCropImageView.setTranslationX(0);
-        mGestureCropImageView.setTranslationY(0);
-        mGestureCropImageView.setPivotX(0);
-        mGestureCropImageView.setPivotY(0);
-        mGestureCropImageView.setScaleX(1);
-        mGestureCropImageView.setScaleY(1);
+        final FrameLayout layout = weakRefContainer.get();
+        if(layout!=null){
+            mGestureCropImageView.clearAnimation();
+            mGestureCropImageView.setTranslationX(0);
+            mGestureCropImageView.setTranslationY(0);
+            mGestureCropImageView.setPivotX(0);
+            mGestureCropImageView.setPivotY(0);
+            mGestureCropImageView.setScaleX(1);
+            mGestureCropImageView.setScaleY(1);
 
-        mGestureCropImageView.animate()
-                .setDuration(1000)
-                .translationX(fromRect.left)
-                .translationY(fromRect.top)
-                .scaleX((float) fromRect.width() / imageSize)
-                .scaleY((float) fromRect.height() / imageSize)
-                .setStartDelay(100)
-                .withEndAction(new Runnable() {
-                    @Override
-                    public void run() {
-                        Log.e("animation", "setupImagePositionOnHide");
-                    }
-                });
-        toolbar.setAlpha(1);
-        mWrapperStates.setAlpha(1);
-        uCropShadow.setVisibility(View.GONE);
-        imageLogo.setAlpha(1);
-        mOverlayView.setAlpha(1);
-        toolbar.animate()
-                .setDuration(ANIM_DURATION)
-                .alpha(0);
-        mWrapperStates.animate()
-                .setDuration(ANIM_DURATION)
-                .alpha(0);
-        imageLogo.animate()
-                .setDuration(ANIM_DURATION)
-                .alpha(0);
-        mOverlayView.animate()
-                .setDuration(ANIM_DURATION)
-                .alpha(0);
-        toolbar.animate().start();
-        mWrapperStates.animate().start();
-        background.setBackgroundColor(Color.TRANSPARENT);
-        imageLogo.animate().start();
-        mOverlayView.animate().start();
-        mGestureCropImageView.animate().start();
+            mGestureCropImageView.animate()
+                    .setDuration(1000)
+                    .translationX(fromRect.left)
+                    .translationY(fromRect.top)
+                    .scaleX((float) fromRect.width() / imageSize)
+                    .scaleY((float) fromRect.height() / imageSize)
+                    .setStartDelay(100)
+                    .withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.e("animation", "setupImagePositionOnHide");
+                            layout.setVisibility(View.GONE);
+                            onFragmentResultUriListener.setResultUri(RESULT_CANCELED ,new Intent());
+                        }
+                    });
+            toolbar.setAlpha(1);
+            mWrapperStates.setAlpha(1);
+            uCropShadow.setVisibility(View.GONE);
+            imageLogo.setAlpha(1);
+            mOverlayView.setAlpha(1);
+            toolbar.animate()
+                    .setDuration(ANIM_DURATION)
+                    .alpha(0);
+            mWrapperStates.animate()
+                    .setDuration(ANIM_DURATION)
+                    .alpha(0);
+            imageLogo.animate()
+                    .setDuration(ANIM_DURATION)
+                    .alpha(0);
+            mOverlayView.animate()
+                    .setDuration(ANIM_DURATION)
+                    .alpha(0);
+            toolbar.animate().start();
+            mWrapperStates.animate().start();
+            background.setBackgroundColor(Color.TRANSPARENT);
+            imageLogo.animate().start();
+            mOverlayView.animate().start();
+            mGestureCropImageView.animate().start();
+        }
     }
 
     private void setupImagePositionOnHidePositive() {
-        mGestureCropImageView.clearAnimation();
-        mGestureCropImageView.setTranslationX(0);
-        mGestureCropImageView.setTranslationY(0);
-        mGestureCropImageView.setPivotX(0);
-        mGestureCropImageView.setPivotY(0);
-        mGestureCropImageView.setScaleX(1);
-        mGestureCropImageView.setScaleY(1);
+        final FrameLayout layout = weakRefContainer.get();
+        if (layout!=null){
+            mGestureCropImageView.clearAnimation();
+            mGestureCropImageView.setTranslationX(0);
+            mGestureCropImageView.setTranslationY(0);
+            mGestureCropImageView.setPivotX(0);
+            mGestureCropImageView.setPivotY(0);
+            mGestureCropImageView.setScaleX(1);
+            mGestureCropImageView.setScaleY(1);
 
-        mGestureCropImageView.animate()
-                .setDuration(ANIM_DURATION)
-                .translationX(getWidth())
-                .translationY(getHeight())
-                .scaleX((float) 0.001)
-                .scaleY((float) 0.001)
-                .setStartDelay(100);
-        toolbar.setAlpha(1);
-        mWrapperStates.setAlpha(1);
-        uCropShadow.setVisibility(View.GONE);
-        imageLogo.setAlpha(1);
-        mOverlayView.setAlpha(1);
-        toolbar.animate()
-                .setDuration(ANIM_DURATION)
-                .alpha(0);
-        mWrapperStates.animate()
-                .setDuration(ANIM_DURATION)
-                .alpha(0);
-        imageLogo.animate()
-                .setDuration(ANIM_DURATION)
-                .alpha(0);
-        mOverlayView.animate()
-                .setDuration(ANIM_DURATION)
-                .alpha(0);
-        toolbar.animate().start();
-        mWrapperStates.animate().start();
-        background.setBackgroundColor(Color.TRANSPARENT);
-        imageLogo.animate().start();
-        mOverlayView.animate().start();
-        mGestureCropImageView.animate().start();
+            mGestureCropImageView.animate()
+                    .setDuration(ANIM_DURATION)
+                    .translationX(getWidth())
+                    .translationY(getHeight())
+                    .scaleX((float) 0.001)
+                    .scaleY((float) 0.001)
+                    .setStartDelay(100)
+                    .withEndAction(new Runnable() {
+                        @Override
+                        public void run() {
+                            Log.e("animation", "setupImagePositionOnHide");
+                            //((RelativeLayout) view.findViewById(R.id.ucrop_photobox)).removeView(mBlockingView);
+                            layout.setVisibility(View.GONE);
+                        }
+                    });
+            toolbar.setAlpha(1);
+            mWrapperStates.setAlpha(1);
+            uCropShadow.setVisibility(View.GONE);
+            imageLogo.setAlpha(1);
+            mOverlayView.setAlpha(1);
+            toolbar.animate()
+                    .setDuration(ANIM_DURATION)
+                    .alpha(0);
+            mWrapperStates.animate()
+                    .setDuration(ANIM_DURATION)
+                    .alpha(0);
+            imageLogo.animate()
+                    .setDuration(ANIM_DURATION)
+                    .alpha(0);
+            mOverlayView.animate()
+                    .setDuration(ANIM_DURATION)
+                    .alpha(0);
+            toolbar.animate().start();
+            mWrapperStates.animate().start();
+            background.setBackgroundColor(Color.TRANSPARENT);
+            imageLogo.animate().start();
+            mOverlayView.animate().start();
+            mGestureCropImageView.animate().start();
+        }
     }
 
     public void setupStateBeforeAnimation(){
@@ -1007,7 +1008,7 @@ public class UCropFragment extends Fragment {
     }
 
     private void finish(){
-        Toast.makeText(getContext(),"Finish",Toast.LENGTH_SHORT).show();
+        //Toast.makeText(getContext(),"Finish",Toast.LENGTH_SHORT).show();
     }
 
     protected void cropAndSaveImage() {
@@ -1063,30 +1064,6 @@ public class UCropFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         onFragmentResultUriListener = null;
-    }
-
-    public GestureCropImageView getmGestureCropImageView() {
-        return mGestureCropImageView;
-    }
-
-    public OverlayView getmOverlayView() {
-        return mOverlayView;
-    }
-
-    public ImageView getImageLogo() {
-        return imageLogo;
-    }
-
-    public LinearLayout getmWrapperStates() {
-        return mWrapperStates;
-    }
-
-    public Toolbar getToolbar() {
-        return toolbar;
-    }
-
-    public ImageView getuCropShadow() {
-        return uCropShadow;
     }
 
     private void some() {
