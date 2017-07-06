@@ -429,7 +429,14 @@ public class SampleActivity extends BaseActivity implements UCropFragment.OnFrag
             fTrans.replace(R.id.frgmCont, uCropFragment);
             fTrans.commit();
         }
+    }
 
-
+    @Override
+    public void onBackPressed() {
+        if(uCropFragment != null && uCropFragment.isVisible() == true){
+            uCropFragment.onBackPressed();
+        } else {
+            super.onBackPressed();
+        }
     }
 }

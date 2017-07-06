@@ -1081,4 +1081,8 @@ public class UCropFragment extends Fragment {
     private int getHeight(){
         return height-(height/9);
     }
+
+    public void onBackPressed(){
+        setupImagePositionOnHide();
+    }
 }
