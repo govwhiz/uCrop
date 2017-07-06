@@ -36,6 +36,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -306,7 +307,7 @@ public class UCropFragment extends Fragment {
             mGestureCropImageView.setScaleY(1);
 
             mGestureCropImageView.animate()
-                    .setDuration(ANIM_DURATION)
+                    .setDuration(1000)
                     .translationX(getWidth())
                     .translationY(getHeight())
                     .scaleX((float) 0.001)
@@ -516,7 +517,7 @@ public class UCropFragment extends Fragment {
         toolbarTitle.setTextColor(mToolbarWidgetColor);
         toolbarTitle.setText(mToolbarTitle);
 
-        final ImageView imageDone = (ImageView) view.findViewById(R.id.image_done);
+        final ImageView imageDone = (ImageView) toolbar.findViewById(R.id.image_done);
         Drawable ic_done = getResources().getDrawable( R.drawable.ucrop_ic_done);
         if (ic_done != null) {
             ic_done.mutate();
@@ -524,13 +525,22 @@ public class UCropFragment extends Fragment {
             imageDone.setImageDrawable(ic_done);
         }
 
-        ImageView imageCancel = (ImageView) view.findViewById(R.id.image_cancel);
+        ImageView imageCancel = (ImageView) toolbar.findViewById(R.id.image_cancel);
         imageCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                resetRotation();
                 setupImagePositionOnHide();
             }
         });
+
+//        ImageButton imageCancel2 = (ImageButton) toolbar.findViewById(R.id.ucrop_imagebutton);
+//        imageCancel2.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                setupImagePositionOnHide();
+//            }
+//        });
 
         //toolbar.setVisibility(View.GONE);
 
@@ -1083,6 +1093,7 @@ public class UCropFragment extends Fragment {
     }
 
     public void onBackPressed(){
+        resetRotation();
         setupImagePositionOnHide();
     }
 }

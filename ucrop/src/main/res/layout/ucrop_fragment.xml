@@ -16,7 +16,12 @@
         <ImageView
             android:id="@+id/image_cancel"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:layout_marginLeft="10dp"
             android:layout_gravity="left"
             android:src="@drawable/ucrop_ic_cross"/>
 
@@ -32,7 +37,11 @@
         <ImageView
             android:id="@+id/image_done"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
             android:layout_marginRight="10dp"
             android:layout_gravity="right"
             android:src="@drawable/ucrop_ic_done"/>
@@ -65,5 +74,8 @@
             android:alpha="0"/>
 
     </FrameLayout>
+
+
+
 
 </RelativeLayout>
