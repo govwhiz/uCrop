@@ -6,12 +6,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
 import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.ColorInt;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.IdRes;
@@ -25,6 +27,7 @@ import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -116,6 +119,8 @@ public class UCropFragment extends Fragment {
     private UCropView mUCropView;
     private GestureCropImageView mGestureCropImageView;
     private OverlayView mOverlayView;
+    private FrameLayout background;
+    private ImageView imageLogo;
     private ViewGroup mWrapperStateAspectRatio, mWrapperStateRotate, mWrapperStateScale;
     private ViewGroup mLayoutAspectRatio, mLayoutRotate, mLayoutScale;
     private List<ViewGroup> mCropAspectRatioViews = new ArrayList<>();
@@ -140,6 +145,9 @@ public class UCropFragment extends Fragment {
     private boolean imageInit;
     private Rect fromRect;
     private int imageSize;
+    private int width;
+    private int height;
+    private View view;
 
     //private OnFragmentInteractionListener mListener;
 
@@ -147,20 +155,13 @@ public class UCropFragment extends Fragment {
         // Required empty public constructor
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment UCropFragment.
-     */
+
     // TODO: Rename and change types and number of parameters
-    public static UCropFragment newInstance(FrameLayout fragmentContent, String param1, String param2) {
+    public static UCropFragment newInstance(FrameLayout fragmentContent) {
         UCropFragment fragment = new UCropFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        //args.putString(ARG_PARAM1, param1);
+        //args.putString(ARG_PARAM2, param2);
         fragment.weakRefContainer = new WeakReference<>(fragmentContent);
         fragment.setArguments(args);
         return fragment;
@@ -169,35 +170,74 @@ public class UCropFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.e("onCreate","onCreate");
         setHasOptionsMenu(true);
         if (getArguments() != null) {
-            source = Uri.parse(getArguments().getString(ARG_PARAM1));
-            destination = Uri.parse(getArguments().getString(ARG_PARAM2));
+//            source = Uri.parse(getArguments().getString(ARG_PARAM1));
+//            destination = Uri.parse(getArguments().getString(ARG_PARAM2));
             //mParam1 = getArguments().getString(ARG_PARAM1);
             //mParam2 = getArguments().getString(ARG_PARAM2);
             AppCompatDelegate.setCompatVectorFromResourcesEnabled(true);
         }
     }
 
-    public void setItem(Rect fromRect) {
-        imageInit = false;
+    public void setItem(Rect fromRect, String param1, String param2) {
+        imageInit = true;
         this.fromRect = fromRect;
+        source = Uri.parse(param1);
+        destination = Uri.parse(param2);
     }
 
     public void show() {
+        Log.e("qwe","show");
         FrameLayout layout = weakRefContainer.get();
         startShowing = true;
         if (layout != null && imageInit) {
+            setupAll(view);
             startShow();
         }
     }
 
     private void startShow(){
+        Log.e("qwe","startShow");
         FrameLayout layout = weakRefContainer.get();
         if (layout != null) {
-            setupImagePositionOnShow();
-            mGestureCropImageView.animate().start();
-            startShowing = false;
+//            setupImagePositionOnShow();
+//            mGestureCropImageView.animate().start();
+//            startShowing = false;
+            setupStateBeforeAnimation();
+            layout.setVisibility(View.VISIBLE);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mGestureCropImageView.clearAnimation();
+                    mGestureCropImageView.setTranslationX(fromRect.left);
+                    mGestureCropImageView.setTranslationY(fromRect.top);
+                    mGestureCropImageView.setPivotX(0);
+                    mGestureCropImageView.setPivotY(0);
+                    mGestureCropImageView.setScaleX((float) fromRect.width() / imageSize);
+                    mGestureCropImageView.setScaleY((float) fromRect.height() / imageSize);
+                    mGestureCropImageView.animate()
+                            .setDuration(1000)
+                            .translationX(0)
+                            .translationY(0)
+                            .scaleX(1)
+                            .scaleY(1)
+                            .withStartAction(new Runnable() {
+                                @Override
+                                public void run() {
+                                    background.setVisibility(View.VISIBLE);
+                                }
+                            })
+                            .withEndAction(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Log.e("animation", "setupImagePositionOnShow end");
+                                    setupStateAfterAnimation();
+                                }
+                            });
+                }
+            }, 100);
         }
     }
 
@@ -217,12 +257,147 @@ public class UCropFragment extends Fragment {
                 .scaleY(1);
     }
 
+    private void setupImagePositionOnHide() {
+        mGestureCropImageView.clearAnimation();
+        mGestureCropImageView.setTranslationX(0);
+        mGestureCropImageView.setTranslationY(0);
+        mGestureCropImageView.setPivotX(0);
+        mGestureCropImageView.setPivotY(0);
+        mGestureCropImageView.setScaleX(1);
+        mGestureCropImageView.setScaleY(1);
+
+        mGestureCropImageView.animate()
+                .setDuration(1000)
+                .translationX(fromRect.left)
+                .translationY(fromRect.top)
+                .scaleX((float) fromRect.width() / imageSize)
+                .scaleY((float) fromRect.height() / imageSize)
+                .setStartDelay(100)
+                .withEndAction(new Runnable() {
+                    @Override
+                    public void run() {
+                        Log.e("animation", "setupImagePositionOnHide");
+                    }
+                });
+        toolbar.setAlpha(1);
+        mWrapperStates.setAlpha(1);
+        uCropShadow.setVisibility(View.GONE);
+        imageLogo.setAlpha(1);
+        mOverlayView.setAlpha(1);
+        toolbar.animate()
+                .setDuration(ANIM_DURATION)
+                .alpha(0);
+        mWrapperStates.animate()
+                .setDuration(ANIM_DURATION)
+                .alpha(0);
+        imageLogo.animate()
+                .setDuration(ANIM_DURATION)
+                .alpha(0);
+        mOverlayView.animate()
+                .setDuration(ANIM_DURATION)
+                .alpha(0);
+        toolbar.animate().start();
+        mWrapperStates.animate().start();
+        background.setBackgroundColor(Color.TRANSPARENT);
+        imageLogo.animate().start();
+        mOverlayView.animate().start();
+        mGestureCropImageView.animate().start();
+    }
+
+    private void setupImagePositionOnHidePositive() {
+        mGestureCropImageView.clearAnimation();
+        mGestureCropImageView.setTranslationX(0);
+        mGestureCropImageView.setTranslationY(0);
+        mGestureCropImageView.setPivotX(0);
+        mGestureCropImageView.setPivotY(0);
+        mGestureCropImageView.setScaleX(1);
+        mGestureCropImageView.setScaleY(1);
+
+        mGestureCropImageView.animate()
+                .setDuration(ANIM_DURATION)
+                .translationX(getWidth())
+                .translationY(getHeight())
+                .scaleX((float) 0.001)
+                .scaleY((float) 0.001)
+                .setStartDelay(100);
+        toolbar.setAlpha(1);
+        mWrapperStates.setAlpha(1);
+        uCropShadow.setVisibility(View.GONE);
+        imageLogo.setAlpha(1);
+        mOverlayView.setAlpha(1);
+        toolbar.animate()
+                .setDuration(ANIM_DURATION)
+                .alpha(0);
+        mWrapperStates.animate()
+                .setDuration(ANIM_DURATION)
+                .alpha(0);
+        imageLogo.animate()
+                .setDuration(ANIM_DURATION)
+                .alpha(0);
+        mOverlayView.animate()
+                .setDuration(ANIM_DURATION)
+                .alpha(0);
+        toolbar.animate().start();
+        mWrapperStates.animate().start();
+        background.setBackgroundColor(Color.TRANSPARENT);
+        imageLogo.animate().start();
+        mOverlayView.animate().start();
+        mGestureCropImageView.animate().start();
+    }
+
+    public void setupStateBeforeAnimation(){
+        Log.e("qwe","setupStateBeforeAnimation");
+        background.setBackgroundColor(Color.TRANSPARENT);
+        uCropShadow.setVisibility(View.GONE);
+        toolbar.setAlpha(0);
+        mWrapperStates.setAlpha(0);
+        imageLogo.setAlpha(0);
+        mOverlayView.setAlpha(0);
+    }
+
+    public void setupStateAfterAnimation(){
+        Log.e("qwe","setupStateAfterAnimation");
+        toolbar.animate()
+                .setDuration(ANIM_DURATION)
+                .alpha(1);
+        mWrapperStates.animate()
+                .setDuration(ANIM_DURATION)
+                .alpha(1);
+        imageLogo.animate()
+                .setDuration(ANIM_DURATION)
+                .alpha(1);
+        mOverlayView.animate()
+                .setDuration(ANIM_DURATION)
+                .alpha(1);
+        toolbar.animate().start();
+        mWrapperStates.animate().start();
+        background.setBackgroundColor(mRootViewBackgroundColor);
+        imageLogo.animate().start();
+        uCropShadow.setVisibility(View.VISIBLE);
+        mOverlayView.animate().start();
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.e("onCreateView","onCreateView");
         startShowing = false;
         // Inflate the layout for this fragment
-        View view = inflater.inflate(R.layout.ucrop_fragment, container, false);
+        view = inflater.inflate(R.layout.ucrop_fragment, container, false);
+        some();
+
+        //mStateClickListener.onClick(mWrapperStateRotate);
+//        mWrapperStateAspectRatio.setOnClickListener(null);
+//        mWrapperStateRotate.setOnClickListener(null);
+//        mWrapperStateScale.setOnClickListener(null);
+//        mWrapperStateAspectRatio.setClickable(false);
+//        mWrapperStateRotate.setClickable(false);
+//        mWrapperStateScale.setClickable(false);
+        //setupStateBeforeAnimation();
+        return view;
+    }
+
+    private void setupAll(View view){
         mCropIntent = new Intent();
         Bundle mCropOptionsBundle = new Bundle();
         mCropOptionsBundle.putParcelable(EXTRA_INPUT_URI, source);
@@ -236,17 +411,10 @@ public class UCropFragment extends Fragment {
         setInitialState();
         addBlockingView(view);
         mWrapperStateScale.setSelected(false);
+        mWrapperStateScale.setBackgroundColor(getResources().getColor(R.color.ucrop_color_widget_background));
         mOverlayView.setCropGridColor(Color.TRANSPARENT);
 
         setRotateSetting();
-        //mStateClickListener.onClick(mWrapperStateRotate);
-//        mWrapperStateAspectRatio.setOnClickListener(null);
-//        mWrapperStateRotate.setOnClickListener(null);
-//        mWrapperStateScale.setOnClickListener(null);
-//        mWrapperStateAspectRatio.setClickable(false);
-//        mWrapperStateRotate.setClickable(false);
-//        mWrapperStateScale.setClickable(false);
-        return view;
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -355,6 +523,16 @@ public class UCropFragment extends Fragment {
             imageDone.setImageDrawable(ic_done);
         }
 
+        ImageView imageCancel = (ImageView) view.findViewById(R.id.image_cancel);
+        imageCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setupImagePositionOnHide();
+            }
+        });
+
+        //toolbar.setVisibility(View.GONE);
+
 //        final ImageView imageLoader = (ImageView) view.findViewById(R.id.image_load);
 //        Drawable ic_load = getResources().getDrawable( R.drawable.ucrop_vector_loader_animated);
 //        if (ic_load != null) {
@@ -375,6 +553,7 @@ public class UCropFragment extends Fragment {
 
                 Log.e("click","click");
                 cropAndSaveImage();
+
 
             }
         });
@@ -453,10 +632,12 @@ public class UCropFragment extends Fragment {
             if(mWrapperStateScale.isSelected()){
                 //isSelectCropButton = false;
                 mWrapperStateScale.setSelected(false);
+                mWrapperStateScale.setBackgroundColor(getResources().getColor(R.color.ucrop_color_widget_background));
                 mOverlayView.setCropGridColor(Color.TRANSPARENT);
                 mOverlayView.invalidate();
             } else {
                 mWrapperStateScale.setSelected(true);
+                mWrapperStateScale.setBackgroundColor(getResources().getColor(R.color.ucrop_color_press_button));
                 mOverlayView.setCropGridColor(getResources().getColor(R.color.ucrop_color_default_crop_grid));
                 mOverlayView.invalidate();
             }
@@ -555,7 +736,6 @@ public class UCropFragment extends Fragment {
                 public void onClick(View v) {
                     mGestureCropImageView.setTargetAspectRatio(
                             ((AspectRatioTextView) ((ViewGroup) v).getChildAt(0)).getAspectRatio(v.isSelected()));
-                    mGestureCropImageView.setImageToWrapCropBounds();
                     if (!v.isSelected()) {
                         for (ViewGroup cropAspectRatioView : mCropAspectRatioViews) {
                             cropAspectRatioView.setSelected(cropAspectRatioView == v);
@@ -665,13 +845,14 @@ public class UCropFragment extends Fragment {
         mUCropView = (UCropView) view.findViewById(R.id.ucrop);
         mGestureCropImageView = mUCropView.getCropImageView();
         mOverlayView = mUCropView.getOverlayView();
-
         mGestureCropImageView.setTransformImageListener(mImageListener);
-
-        ((ImageView) view.findViewById(R.id.image_view_logo)).setColorFilter(mLogoColor, PorterDuff.Mode.SRC_ATOP);
-
-        view.findViewById(R.id.ucrop_frame).setBackgroundColor(mRootViewBackgroundColor);
+        imageLogo = (ImageView) view.findViewById(R.id.image_view_logo);
+        imageLogo.setColorFilter(mLogoColor, PorterDuff.Mode.SRC_ATOP);
+        background = (FrameLayout) view.findViewById(R.id.ucrop_frame);
+        background.setBackgroundColor(Color.TRANSPARENT);
     }
+
+
 
     private TransformImageView.TransformImageListener mImageListener = new TransformImageView.TransformImageListener() {
         @Override
@@ -840,6 +1021,7 @@ public class UCropFragment extends Fragment {
             public void onBitmapCropped(@NonNull Uri resultUri, int offsetX, int offsetY, int imageWidth, int imageHeight) {
                 setResultUri(resultUri, mGestureCropImageView.getTargetAspectRatio(), offsetX, offsetY, imageWidth, imageHeight);
                 finish();
+                setupImagePositionOnHidePositive();
             }
 
             @Override
@@ -881,5 +1063,45 @@ public class UCropFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         onFragmentResultUriListener = null;
+    }
+
+    public GestureCropImageView getmGestureCropImageView() {
+        return mGestureCropImageView;
+    }
+
+    public OverlayView getmOverlayView() {
+        return mOverlayView;
+    }
+
+    public ImageView getImageLogo() {
+        return imageLogo;
+    }
+
+    public LinearLayout getmWrapperStates() {
+        return mWrapperStates;
+    }
+
+    public Toolbar getToolbar() {
+        return toolbar;
+    }
+
+    public ImageView getuCropShadow() {
+        return uCropShadow;
+    }
+
+    private void some() {
+        Display display = getActivity().getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        width = size.x;
+        height = size.y;
+    }
+
+    private int getWidth(){
+        return width-(width/3/3*2);
+    }
+
+    private int getHeight(){
+        return height-(height/9);
     }
 }

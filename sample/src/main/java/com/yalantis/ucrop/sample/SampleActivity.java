@@ -62,6 +62,12 @@ public class SampleActivity extends BaseActivity implements UCropFragment.OnFrag
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sample);
 
+        fTrans = getSupportFragmentManager().beginTransaction();
+        FrameLayout frameLayout = (FrameLayout)findViewById(R.id.frgmCont);
+        uCropFragment = new UCropFragment().newInstance(frameLayout);
+        fTrans.replace(R.id.frgmCont, uCropFragment);
+        fTrans.commit();
+
         setupUI();
     }
 
@@ -113,29 +119,29 @@ public class SampleActivity extends BaseActivity implements UCropFragment.OnFrag
         findViewById(R.id.button_random_image).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-//                Random random = new Random();
-//                int minSizePixels = 800;
-//                int maxSizePixels = 2400;
-//                startCropActivity(Uri.parse(String.format(Locale.getDefault(), "https://unsplash.it/%d/%d/?random",
-//                        minSizePixels + random.nextInt(maxSizePixels - minSizePixels),
-//                        minSizePixels + random.nextInt(maxSizePixels - minSizePixels))));
-                //String stringUri = "content://com.android.providers.media.documents/document/image%3A1327";
-                String stringUri = "content://media/external/images/media/82555";
-                //String stringUri = "content://com.android.providers.media.documents/document/image%3A162";
+//                //String stringUri = "content://com.android.providers.media.documents/document/image%3A1327";
+//                //String stringUri = "content://media/external/images/media/82555";
+//                String stringUri = "content://com.android.providers.media.documents/document/image%3A162";
+//                String destinationFileName = SAMPLE_CROPPED_IMAGE_NAME;
+//                destinationFileName += ".jpg";
+//                Uri source = Uri.parse(stringUri);
+//                Uri destination = Uri.fromFile(new File(getCacheDir(), destinationFileName));
+//                fTrans = getSupportFragmentManager().beginTransaction();
+//                FrameLayout frameLayout = (FrameLayout)findViewById(R.id.frgmCont);
+//                Rect rect = new Rect(8,8,133,148);
+//                uCropFragment = new UCropFragment().newInstance(frameLayout);
+//                uCropFragment.setItem(rect, source.toString(),destination.toString());
+//                fTrans.replace(R.id.frgmCont, uCropFragment);
+//                fTrans.commit();
+
+                Rect rect = new Rect(8,8,133,148);
+                String stringUri = "content://com.android.providers.media.documents/document/image%3A162";
                 String destinationFileName = SAMPLE_CROPPED_IMAGE_NAME;
                 destinationFileName += ".jpg";
                 Uri source = Uri.parse(stringUri);
                 Uri destination = Uri.fromFile(new File(getCacheDir(), destinationFileName));
-                //fTrans = getSupportFragmentManager().beginTransaction();
-//                uCropFragment = new UCropFragment();
-//                fTrans.add(R.id.frgmCont, uCropFragment);
-                FrameLayout frameLayout = (FrameLayout)findViewById(R.id.frgmCont);
-                Rect rect = new Rect(8,8,133,148);
-                uCropFragment = new UCropFragment().newInstance(frameLayout, source.toString(),destination.toString());
-                uCropFragment.setItem(rect);
+                uCropFragment.setItem(rect, source.toString(),destination.toString());
                 uCropFragment.show();
-//                fTrans.add(R.id.frgmCont, uCropFragment);
-//                fTrans.commit();
             }
         });
 
@@ -411,7 +417,8 @@ public class SampleActivity extends BaseActivity implements UCropFragment.OnFrag
 
         final Uri resultUri = UCrop.getOutput(data);
         if (resultUri != null) {
-            ResultActivity.startWithUri(SampleActivity.this, resultUri);
+            //ResultActivity.startWithUri(SampleActivity.this, resultUri);
+            Log.e("qwe","get result");
         } else {
             Toast.makeText(SampleActivity.this, R.string.toast_cannot_retrieve_cropped_image, Toast.LENGTH_SHORT).show();
         }
