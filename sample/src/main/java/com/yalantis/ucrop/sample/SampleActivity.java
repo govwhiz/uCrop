@@ -415,6 +415,13 @@ public class SampleActivity extends BaseActivity implements UCropFragment.OnFrag
     public void setResultUri(final int resultCode, final Intent data) {
         //Toast.makeText(this,str,Toast.LENGTH_LONG).show();
         Log.e("resultCode",resultCode+"");
+        try {
+            Log.e("setResultUri","start sleep");
+            Thread.sleep(3000);
+            Log.e("setResultUri","finish sleep");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         if(resultCode == RESULT_OK){
             final Uri resultUri = UCrop.getOutput(data);
             if (resultUri != null) {

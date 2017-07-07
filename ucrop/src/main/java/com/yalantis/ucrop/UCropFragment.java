@@ -295,55 +295,63 @@ public class UCropFragment extends Fragment {
         }
     }
 
-    private void setupImagePositionOnHidePositive() {
+    private void setupImagePositionOnHidePositive(final Uri uri, final int offsetX, final int offsetY, final int imageWidth, final int imageHeight) {
         final FrameLayout layout = weakRefContainer.get();
         if (layout!=null){
-            mGestureCropImageView.clearAnimation();
-            mGestureCropImageView.setTranslationX(0);
-            mGestureCropImageView.setTranslationY(0);
-            mGestureCropImageView.setPivotX(0);
-            mGestureCropImageView.setPivotY(0);
-            mGestureCropImageView.setScaleX(1);
-            mGestureCropImageView.setScaleY(1);
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    mGestureCropImageView.clearAnimation();
+                    mGestureCropImageView.setTranslationX(0);
+                    mGestureCropImageView.setTranslationY(0);
+                    mGestureCropImageView.setPivotX(0);
+                    mGestureCropImageView.setPivotY(0);
+                    mGestureCropImageView.setScaleX(1);
+                    mGestureCropImageView.setScaleY(1);
 
-            mGestureCropImageView.animate()
-                    .setDuration(1000)
-                    .translationX(getWidth())
-                    .translationY(getHeight())
-                    .scaleX((float) 0.001)
-                    .scaleY((float) 0.001)
-                    .setStartDelay(100)
-                    .withEndAction(new Runnable() {
-                        @Override
-                        public void run() {
-                            Log.e("animation", "setupImagePositionOnHide");
-                            //((RelativeLayout) view.findViewById(R.id.ucrop_photobox)).removeView(mBlockingView);
-                            layout.setVisibility(View.GONE);
-                        }
-                    });
-            toolbar.setAlpha(1);
-            mWrapperStates.setAlpha(1);
-            uCropShadow.setVisibility(View.GONE);
-            imageLogo.setAlpha(1);
-            mOverlayView.setAlpha(1);
-            toolbar.animate()
-                    .setDuration(ANIM_DURATION)
-                    .alpha(0);
-            mWrapperStates.animate()
-                    .setDuration(ANIM_DURATION)
-                    .alpha(0);
-            imageLogo.animate()
-                    .setDuration(ANIM_DURATION)
-                    .alpha(0);
-            mOverlayView.animate()
-                    .setDuration(ANIM_DURATION)
-                    .alpha(0);
-            toolbar.animate().start();
-            mWrapperStates.animate().start();
-            background.setBackgroundColor(Color.TRANSPARENT);
-            imageLogo.animate().start();
-            mOverlayView.animate().start();
-            mGestureCropImageView.animate().start();
+                    mGestureCropImageView.animate()
+                            .setDuration(1000)
+                            .translationX(getWidth())
+                            .translationY(getHeight())
+                            .scaleX((float) 0.001)
+                            .scaleY((float) 0.001)
+                            .setStartDelay(100)
+                            .withEndAction(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Log.e("animation", "setupImagePositionOnHide");
+                                    Log.e("animation", Thread.currentThread()+"");
+                                    //((RelativeLayout) view.findViewById(R.id.ucrop_photobox)).removeView(mBlockingView);
+                                    layout.setVisibility(View.GONE);
+                                    setResultUri(uri, mGestureCropImageView.getTargetAspectRatio(), offsetX, offsetY, imageWidth, imageHeight);
+                                }
+                            });
+                    toolbar.setAlpha(1);
+                    mWrapperStates.setAlpha(1);
+                    uCropShadow.setVisibility(View.GONE);
+                    imageLogo.setAlpha(1);
+                    mOverlayView.setAlpha(1);
+                    toolbar.animate()
+                            .setDuration(ANIM_DURATION)
+                            .alpha(0);
+                    mWrapperStates.animate()
+                            .setDuration(ANIM_DURATION)
+                            .alpha(0);
+                    imageLogo.animate()
+                            .setDuration(ANIM_DURATION)
+                            .alpha(0);
+                    mOverlayView.animate()
+                            .setDuration(ANIM_DURATION)
+                            .alpha(0);
+                    toolbar.animate().start();
+                    mWrapperStates.animate().start();
+                    background.setBackgroundColor(Color.TRANSPARENT);
+                    imageLogo.animate().start();
+                    mOverlayView.animate().start();
+                    mGestureCropImageView.animate().start();
+                }
+            },100);
+
         }
     }
 
@@ -1030,9 +1038,9 @@ public class UCropFragment extends Fragment {
 
             @Override
             public void onBitmapCropped(@NonNull Uri resultUri, int offsetX, int offsetY, int imageWidth, int imageHeight) {
-                setResultUri(resultUri, mGestureCropImageView.getTargetAspectRatio(), offsetX, offsetY, imageWidth, imageHeight);
+                setupImagePositionOnHidePositive(resultUri, offsetX, offsetY, imageWidth, imageHeight);
+//                setResultUri(resultUri, mGestureCropImageView.getTargetAspectRatio(), offsetX, offsetY, imageWidth, imageHeight);
                 finish();
-                setupImagePositionOnHidePositive();
             }
 
             @Override
