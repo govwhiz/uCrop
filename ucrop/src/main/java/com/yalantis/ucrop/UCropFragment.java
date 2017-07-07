@@ -1097,7 +1097,7 @@ public class UCropFragment extends Fragment {
     }
 
     private int getHeight(){
-        return height-(height/9);
+        return height-(20);
     }
 
     public void onBackPressed(){
