@@ -138,7 +138,7 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Throwable> {
         boolean shouldCrop = shouldCrop(mCroppedImageWidth, mCroppedImageHeight);
         Log.i(TAG, "Should crop: " + shouldCrop);
 
-        if (shouldCrop) {
+//        if (shouldCrop) {
             boolean cropped = cropCImg(mImageInputPath, mImageOutputPath,
                     cropOffsetX, cropOffsetY, mCroppedImageWidth, mCroppedImageHeight,
                     mCurrentAngle, resizeScale, mCompressFormat.ordinal(), mCompressQuality,
@@ -147,10 +147,10 @@ public class BitmapCropTask extends AsyncTask<Void, Void, Throwable> {
                 ImageHeaderParser.copyExif(originalExif, mCroppedImageWidth, mCroppedImageHeight, mImageOutputPath);
             }
             return cropped;
-        } else {
-            FileUtils.copyFile(mImageInputPath, mImageOutputPath);
-            return false;
-        }
+//        } else {
+//            FileUtils.copyFile(mImageInputPath, mImageOutputPath);
+//            return false;
+//        }
     }
 
     /**

@@ -136,7 +136,7 @@ public class SampleActivity extends BaseActivity implements UCropFragment.OnFrag
 //                fTrans.commit();
 
                 Rect rect = new Rect(8,8,133,148);
-                String stringUri = "content://media/external/images/media/82555";
+                String stringUri = "content://com.android.providers.media.documents/document/image%3A264";
                 String destinationFileName = SAMPLE_CROPPED_IMAGE_NAME;
                 destinationFileName += ".jpg";
                 Uri source = Uri.parse(stringUri);
@@ -425,7 +425,7 @@ public class SampleActivity extends BaseActivity implements UCropFragment.OnFrag
         if(resultCode == RESULT_OK){
             final Uri resultUri = UCrop.getOutput(data);
             if (resultUri != null) {
-                //ResultActivity.startWithUri(SampleActivity.this, resultUri);
+                ResultActivity.startWithUri(SampleActivity.this, resultUri);
             } else {
                 Toast.makeText(SampleActivity.this, R.string.toast_cannot_retrieve_cropped_image, Toast.LENGTH_SHORT).show();
             }
