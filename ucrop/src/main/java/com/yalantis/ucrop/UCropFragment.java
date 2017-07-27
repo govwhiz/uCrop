@@ -150,6 +150,7 @@ public class UCropFragment extends Fragment {
     private int width;
     private int height;
     private View view;
+    private boolean isClick = true;
 
     //private OnFragmentInteractionListener mListener;
 
@@ -322,6 +323,7 @@ public class UCropFragment extends Fragment {
                                     Log.e("animation", "setupImagePositionOnHide");
                                     Log.e("animation", Thread.currentThread()+"");
                                     //((RelativeLayout) view.findViewById(R.id.ucrop_photobox)).removeView(mBlockingView);
+                                    isClick = true;
                                     layout.setVisibility(View.GONE);
                                     setResultUri(uri, mGestureCropImageView.getTargetAspectRatio(), offsetX, offsetY, imageWidth, imageHeight);
                                 }
@@ -569,11 +571,11 @@ public class UCropFragment extends Fragment {
         imageDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Log.e("click","click");
-                cropAndSaveImage();
-
-
+                if(isClick){
+                    isClick = false;
+                    Log.e("click","click");
+                    cropAndSaveImage();
+                }
             }
         });
 

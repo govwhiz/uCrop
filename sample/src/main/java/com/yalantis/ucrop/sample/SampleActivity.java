@@ -136,7 +136,7 @@ public class SampleActivity extends BaseActivity implements UCropFragment.OnFrag
 //                fTrans.commit();
 
                 Rect rect = new Rect(8,8,133,148);
-                String stringUri = "content://com.android.providers.media.documents/document/image%3A264";
+                String stringUri = "content://com.android.providers.media.documents/document/image%3A129";
                 String destinationFileName = SAMPLE_CROPPED_IMAGE_NAME;
                 destinationFileName += ".jpg";
                 Uri source = Uri.parse(stringUri);
