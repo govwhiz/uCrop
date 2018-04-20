@@ -579,7 +579,7 @@ public class UCropFragment extends Fragment {
             }
         });
 
-         //Color buttons inside the Toolbar
+        //Color buttons inside the Toolbar
 //        Drawable stateButtonDrawable = ContextCompat.getDrawable(getContext(), mToolbarCancelDrawable).mutate();
 //        stateButtonDrawable.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
 //        toolbar.setNavigationIcon(stateButtonDrawable);
@@ -642,7 +642,7 @@ public class UCropFragment extends Fragment {
         @Override
         public void onClick(View v) {
             //if (!v.isSelected()) {
-                setWidgetState(v.getId());
+            setWidgetState(v.getId());
             //}
         }
     };
@@ -671,7 +671,7 @@ public class UCropFragment extends Fragment {
         mLayoutAspectRatio.setVisibility(stateViewId == R.id.state_aspect_ratio ? View.VISIBLE : View.GONE);
         //mLayoutRotate.setVisibility(stateViewId == R.id.state_rotate ? View.VISIBLE : View.GONE);
         //mWrapperControls.setVisibility(stateViewId == R.id.state_rotate ? View.VISIBLE : View.GONE);
- //       mLayoutScale.setVisibility(stateViewId == R.id.state_scale ? View.VISIBLE : View.GONE);
+        //       mLayoutScale.setVisibility(stateViewId == R.id.state_scale ? View.VISIBLE : View.GONE);
         //mLayoutAspectRatio.setVisibility(View.GONE);
         //mLayoutRotate.setVisibility(View.GONE);
         //mLayoutScale.setVisibility(View.GONE);
@@ -1054,15 +1054,16 @@ public class UCropFragment extends Fragment {
     }
 
     protected void setResultUri(Uri uri, float resultAspectRatio, int offsetX, int offsetY, int imageWidth, int imageHeight) {
-        onFragmentResultUriListener.setResultUri(RESULT_OK, new Intent()
-                .putExtra(UCrop.EXTRA_OUTPUT_URI, uri)
-                .putExtra(UCrop.EXTRA_OUTPUT_CROP_ASPECT_RATIO, resultAspectRatio)
-                .putExtra(UCrop.EXTRA_OUTPUT_IMAGE_WIDTH, imageWidth)
-                .putExtra(UCrop.EXTRA_OUTPUT_IMAGE_HEIGHT, imageHeight)
-                .putExtra(UCrop.EXTRA_OUTPUT_OFFSET_X, offsetX)
-                .putExtra(UCrop.EXTRA_OUTPUT_OFFSET_Y, offsetY)
-        );
-
+        if(onFragmentResultUriListener != null){
+            onFragmentResultUriListener.setResultUri(RESULT_OK, new Intent()
+                    .putExtra(UCrop.EXTRA_OUTPUT_URI, uri)
+                    .putExtra(UCrop.EXTRA_OUTPUT_CROP_ASPECT_RATIO, resultAspectRatio)
+                    .putExtra(UCrop.EXTRA_OUTPUT_IMAGE_WIDTH, imageWidth)
+                    .putExtra(UCrop.EXTRA_OUTPUT_IMAGE_HEIGHT, imageHeight)
+                    .putExtra(UCrop.EXTRA_OUTPUT_OFFSET_X, offsetX)
+                    .putExtra(UCrop.EXTRA_OUTPUT_OFFSET_Y, offsetY)
+            );
+        }
     }
 
     public interface OnFragmentResultUriListener{
