@@ -65,6 +65,7 @@ import java.util.Locale;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
+import static com.yalantis.ucrop.UCrop.RESULT_ERROR;
 
 
 public class UCropFragment extends Fragment {
@@ -903,7 +904,11 @@ public class UCropFragment extends Fragment {
     };
 
     protected void setResultError(Throwable throwable) {
-//        setResult(UCrop.RESULT_ERROR, new Intent().putExtra(UCrop.EXTRA_ERROR, throwable));
+        if(onFragmentResultUriListener != null){
+            onFragmentResultUriListener.setResultUri(RESULT_ERROR, new Intent()
+                    .putExtra(UCrop.EXTRA_ERROR, throwable)
+            );
+        }
     }
 
     private void setAngleText(float angle) {
