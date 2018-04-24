@@ -144,6 +144,7 @@ public class UCropFragment extends Fragment {
     private View view;
     private boolean isClick = true;
     private Dialog progressDialog;
+    private Intent optionIntent;
 
     //private OnFragmentInteractionListener mListener;
 
@@ -182,6 +183,14 @@ public class UCropFragment extends Fragment {
         this.fromRect = fromRect;
         source = Uri.parse(param1);
         destination = Uri.parse(param2);
+    }
+
+    public void setItem(Rect fromRect, String param1, String param2, Intent intent) {
+        imageInit = true;
+        this.fromRect = fromRect;
+        source = Uri.parse(param1);
+        destination = Uri.parse(param2);
+        optionIntent = intent;
     }
 
     public void show() {
@@ -407,8 +416,14 @@ public class UCropFragment extends Fragment {
         Bundle mCropOptionsBundle = new Bundle();
         mCropOptionsBundle.putParcelable(EXTRA_INPUT_URI, source);
         mCropOptionsBundle.putParcelable(EXTRA_OUTPUT_URI, destination);
-        mCropOptionsBundle.putFloat(UCrop.EXTRA_ASPECT_RATIO_X, 1);
-        mCropOptionsBundle.putFloat(UCrop.EXTRA_ASPECT_RATIO_Y, 1);
+        if(optionIntent != null){
+            mCropOptionsBundle.putFloat(UCrop.EXTRA_ASPECT_RATIO_X, optionIntent.getFloatExtra(UCrop.EXTRA_ASPECT_RATIO_X, 0));
+            mCropOptionsBundle.putFloat(UCrop.EXTRA_ASPECT_RATIO_Y, optionIntent.getFloatExtra(UCrop.EXTRA_ASPECT_RATIO_Y, 0));
+            mCropOptionsBundle.putInt(UCrop.EXTRA_MAX_SIZE_X, optionIntent.getIntExtra(UCrop.EXTRA_MAX_SIZE_X,0));
+            mCropOptionsBundle.putInt(UCrop.EXTRA_MAX_SIZE_Y, optionIntent.getIntExtra(UCrop.EXTRA_MAX_SIZE_Y,0));
+            mCropOptionsBundle.putInt(UCrop.Options.EXTRA_COMPRESSION_QUALITY, UCropActivity.DEFAULT_COMPRESS_QUALITY);
+        }
+
         mCropIntent.putExtras(mCropOptionsBundle);
         imageSize = getResources().getDisplayMetrics().widthPixels;
         setupViews(mCropIntent, view);
