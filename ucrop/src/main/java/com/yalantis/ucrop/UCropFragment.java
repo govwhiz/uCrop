@@ -1040,6 +1040,9 @@ public class UCropFragment extends Fragment {
 
             @Override
             public void onBitmapCropped(@NonNull Uri resultUri, int offsetX, int offsetY, int imageWidth, int imageHeight) {
+                if(progressDialog != null && progressDialog.isShowing()){
+                    progressDialog.dismiss();
+                }
                 setupImagePositionOnHidePositive(resultUri, offsetX, offsetY, imageWidth, imageHeight);
 //                setResultUri(resultUri, mGestureCropImageView.getTargetAspectRatio(), offsetX, offsetY, imageWidth, imageHeight);
                 finish();
@@ -1047,6 +1050,9 @@ public class UCropFragment extends Fragment {
 
             @Override
             public void onCropFailure(@NonNull Throwable t) {
+                if(progressDialog != null && progressDialog.isShowing()){
+                    progressDialog.dismiss();
+                }
                 setResultError(t);
                 finish();
             }
