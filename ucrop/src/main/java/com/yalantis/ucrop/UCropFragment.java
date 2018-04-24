@@ -1,7 +1,6 @@
 package com.yalantis.ucrop;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,8 +19,6 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -30,18 +26,15 @@ import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.yalantis.ucrop.callback.BitmapCropCallback;
 import com.yalantis.ucrop.model.AspectRatio;
@@ -54,8 +47,6 @@ import com.yalantis.ucrop.view.UCropView;
 import com.yalantis.ucrop.view.widget.AspectRatioTextView;
 import com.yalantis.ucrop.view.widget.HorizontalProgressWheelView;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
@@ -152,6 +143,7 @@ public class UCropFragment extends Fragment {
     private int height;
     private View view;
     private boolean isClick = true;
+    private Dialog progressDialog;
 
     //private OnFragmentInteractionListener mListener;
 
@@ -1037,6 +1029,9 @@ public class UCropFragment extends Fragment {
     }
 
     protected void cropAndSaveImage() {
+        if(getProgressDialog() != null){
+            progressDialog.show();
+        }
         mBlockingView.setClickable(true);
         mShowLoader = true;
         getActivity().supportInvalidateOptionsMenu();
@@ -1111,5 +1106,13 @@ public class UCropFragment extends Fragment {
     public void onBackPressed(){
         resetRotation();
         setupImagePositionOnHide();
+    }
+
+    public Dialog getProgressDialog() {
+        return progressDialog;
+    }
+
+    public void setProgressDialog(Dialog progressDialog) {
+        this.progressDialog = progressDialog;
     }
 }
