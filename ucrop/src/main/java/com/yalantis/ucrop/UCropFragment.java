@@ -1,7 +1,6 @@
 package com.yalantis.ucrop;
 
-import android.animation.Animator;
-import android.animation.AnimatorListenerAdapter;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,7 +8,6 @@ import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.PorterDuff;
 import android.graphics.Rect;
-import android.graphics.drawable.Animatable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -21,8 +19,6 @@ import android.support.annotation.IntDef;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.app.AppCompatDelegate;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
@@ -30,18 +26,15 @@ import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.FrameLayout;
-import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.yalantis.ucrop.callback.BitmapCropCallback;
 import com.yalantis.ucrop.model.AspectRatio;
@@ -54,8 +47,6 @@ import com.yalantis.ucrop.view.UCropView;
 import com.yalantis.ucrop.view.widget.AspectRatioTextView;
 import com.yalantis.ucrop.view.widget.HorizontalProgressWheelView;
 
-import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.ref.WeakReference;
@@ -65,6 +56,7 @@ import java.util.Locale;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
+import static com.yalantis.ucrop.UCrop.RESULT_ERROR;
 
 
 public class UCropFragment extends Fragment {
@@ -150,6 +142,9 @@ public class UCropFragment extends Fragment {
     private int width;
     private int height;
     private View view;
+    private boolean isClick = true;
+    private Dialog progressDialog;
+    private Intent optionIntent;
 
     //private OnFragmentInteractionListener mListener;
 
@@ -188,6 +183,14 @@ public class UCropFragment extends Fragment {
         this.fromRect = fromRect;
         source = Uri.parse(param1);
         destination = Uri.parse(param2);
+    }
+
+    public void setItem(Rect fromRect, String param1, String param2, Intent intent) {
+        imageInit = true;
+        this.fromRect = fromRect;
+        source = Uri.parse(param1);
+        destination = Uri.parse(param2);
+        optionIntent = intent;
     }
 
     public void show() {
@@ -322,6 +325,7 @@ public class UCropFragment extends Fragment {
                                     Log.e("animation", "setupImagePositionOnHide");
                                     Log.e("animation", Thread.currentThread()+"");
                                     //((RelativeLayout) view.findViewById(R.id.ucrop_photobox)).removeView(mBlockingView);
+                                    isClick = true;
                                     layout.setVisibility(View.GONE);
                                     setResultUri(uri, mGestureCropImageView.getTargetAspectRatio(), offsetX, offsetY, imageWidth, imageHeight);
                                 }
@@ -412,8 +416,14 @@ public class UCropFragment extends Fragment {
         Bundle mCropOptionsBundle = new Bundle();
         mCropOptionsBundle.putParcelable(EXTRA_INPUT_URI, source);
         mCropOptionsBundle.putParcelable(EXTRA_OUTPUT_URI, destination);
-        mCropOptionsBundle.putFloat(UCrop.EXTRA_ASPECT_RATIO_X, 1);
-        mCropOptionsBundle.putFloat(UCrop.EXTRA_ASPECT_RATIO_Y, 1);
+        if(optionIntent != null){
+            mCropOptionsBundle.putFloat(UCrop.EXTRA_ASPECT_RATIO_X, optionIntent.getFloatExtra(UCrop.EXTRA_ASPECT_RATIO_X, 0));
+            mCropOptionsBundle.putFloat(UCrop.EXTRA_ASPECT_RATIO_Y, optionIntent.getFloatExtra(UCrop.EXTRA_ASPECT_RATIO_Y, 0));
+            mCropOptionsBundle.putInt(UCrop.EXTRA_MAX_SIZE_X, optionIntent.getIntExtra(UCrop.EXTRA_MAX_SIZE_X,0));
+            mCropOptionsBundle.putInt(UCrop.EXTRA_MAX_SIZE_Y, optionIntent.getIntExtra(UCrop.EXTRA_MAX_SIZE_Y,0));
+            mCropOptionsBundle.putInt(UCrop.Options.EXTRA_COMPRESSION_QUALITY, UCropActivity.DEFAULT_COMPRESS_QUALITY);
+        }
+
         mCropIntent.putExtras(mCropOptionsBundle);
         imageSize = getResources().getDisplayMetrics().widthPixels;
         setupViews(mCropIntent, view);
@@ -569,15 +579,15 @@ public class UCropFragment extends Fragment {
         imageDone.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Log.e("click","click");
-                cropAndSaveImage();
-
-
+                if(isClick){
+                    isClick = false;
+                    Log.e("click","click");
+                    cropAndSaveImage();
+                }
             }
         });
 
-         //Color buttons inside the Toolbar
+        //Color buttons inside the Toolbar
 //        Drawable stateButtonDrawable = ContextCompat.getDrawable(getContext(), mToolbarCancelDrawable).mutate();
 //        stateButtonDrawable.setColorFilter(mToolbarWidgetColor, PorterDuff.Mode.SRC_ATOP);
 //        toolbar.setNavigationIcon(stateButtonDrawable);
@@ -640,7 +650,7 @@ public class UCropFragment extends Fragment {
         @Override
         public void onClick(View v) {
             //if (!v.isSelected()) {
-                setWidgetState(v.getId());
+            setWidgetState(v.getId());
             //}
         }
     };
@@ -669,7 +679,7 @@ public class UCropFragment extends Fragment {
         mLayoutAspectRatio.setVisibility(stateViewId == R.id.state_aspect_ratio ? View.VISIBLE : View.GONE);
         //mLayoutRotate.setVisibility(stateViewId == R.id.state_rotate ? View.VISIBLE : View.GONE);
         //mWrapperControls.setVisibility(stateViewId == R.id.state_rotate ? View.VISIBLE : View.GONE);
- //       mLayoutScale.setVisibility(stateViewId == R.id.state_scale ? View.VISIBLE : View.GONE);
+        //       mLayoutScale.setVisibility(stateViewId == R.id.state_scale ? View.VISIBLE : View.GONE);
         //mLayoutAspectRatio.setVisibility(View.GONE);
         //mLayoutRotate.setVisibility(View.GONE);
         //mLayoutScale.setVisibility(View.GONE);
@@ -901,7 +911,11 @@ public class UCropFragment extends Fragment {
     };
 
     protected void setResultError(Throwable throwable) {
-//        setResult(UCrop.RESULT_ERROR, new Intent().putExtra(UCrop.EXTRA_ERROR, throwable));
+        if(onFragmentResultUriListener != null){
+            onFragmentResultUriListener.setResultUri(RESULT_ERROR, new Intent()
+                    .putExtra(UCrop.EXTRA_ERROR, throwable)
+            );
+        }
     }
 
     private void setAngleText(float angle) {
@@ -1030,6 +1044,9 @@ public class UCropFragment extends Fragment {
     }
 
     protected void cropAndSaveImage() {
+        if(getProgressDialog() != null){
+            progressDialog.show();
+        }
         mBlockingView.setClickable(true);
         mShowLoader = true;
         getActivity().supportInvalidateOptionsMenu();
@@ -1038,6 +1055,9 @@ public class UCropFragment extends Fragment {
 
             @Override
             public void onBitmapCropped(@NonNull Uri resultUri, int offsetX, int offsetY, int imageWidth, int imageHeight) {
+                if(progressDialog != null && progressDialog.isShowing()){
+                    progressDialog.dismiss();
+                }
                 setupImagePositionOnHidePositive(resultUri, offsetX, offsetY, imageWidth, imageHeight);
 //                setResultUri(resultUri, mGestureCropImageView.getTargetAspectRatio(), offsetX, offsetY, imageWidth, imageHeight);
                 finish();
@@ -1045,6 +1065,9 @@ public class UCropFragment extends Fragment {
 
             @Override
             public void onCropFailure(@NonNull Throwable t) {
+                if(progressDialog != null && progressDialog.isShowing()){
+                    progressDialog.dismiss();
+                }
                 setResultError(t);
                 finish();
             }
@@ -1052,15 +1075,16 @@ public class UCropFragment extends Fragment {
     }
 
     protected void setResultUri(Uri uri, float resultAspectRatio, int offsetX, int offsetY, int imageWidth, int imageHeight) {
-        onFragmentResultUriListener.setResultUri(RESULT_OK, new Intent()
-                .putExtra(UCrop.EXTRA_OUTPUT_URI, uri)
-                .putExtra(UCrop.EXTRA_OUTPUT_CROP_ASPECT_RATIO, resultAspectRatio)
-                .putExtra(UCrop.EXTRA_OUTPUT_IMAGE_WIDTH, imageWidth)
-                .putExtra(UCrop.EXTRA_OUTPUT_IMAGE_HEIGHT, imageHeight)
-                .putExtra(UCrop.EXTRA_OUTPUT_OFFSET_X, offsetX)
-                .putExtra(UCrop.EXTRA_OUTPUT_OFFSET_Y, offsetY)
-        );
-
+        if(onFragmentResultUriListener != null){
+            onFragmentResultUriListener.setResultUri(RESULT_OK, new Intent()
+                    .putExtra(UCrop.EXTRA_OUTPUT_URI, uri)
+                    .putExtra(UCrop.EXTRA_OUTPUT_CROP_ASPECT_RATIO, resultAspectRatio)
+                    .putExtra(UCrop.EXTRA_OUTPUT_IMAGE_WIDTH, imageWidth)
+                    .putExtra(UCrop.EXTRA_OUTPUT_IMAGE_HEIGHT, imageHeight)
+                    .putExtra(UCrop.EXTRA_OUTPUT_OFFSET_X, offsetX)
+                    .putExtra(UCrop.EXTRA_OUTPUT_OFFSET_Y, offsetY)
+            );
+        }
     }
 
     public interface OnFragmentResultUriListener{
@@ -1103,5 +1127,13 @@ public class UCropFragment extends Fragment {
     public void onBackPressed(){
         resetRotation();
         setupImagePositionOnHide();
+    }
+
+    public Dialog getProgressDialog() {
+        return progressDialog;
+    }
+
+    public void setProgressDialog(Dialog progressDialog) {
+        this.progressDialog = progressDialog;
     }
 }
