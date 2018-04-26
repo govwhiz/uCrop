@@ -1,0 +1,25 @@
+apply plugin: 'maven'
+
+repositories {
+    maven {
+        url nexusUrl+'/repository/maven-public/'
+        credentials {
+            username nexusUsername
+            password nexusPassword
+        }
+    }
+}
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "${nexusUrl}/repository/maven-releases/") {
+                authentication(userName: nexusUsername, password: nexusPassword)
+            }
+//            snapshotRepository(url: "${nexusUrl}/repository/maven-snapshots") {
+//                authentication(userName: nexusUsername, password: nexusPassword)
+//            }
+        }
+    }
+}
+
