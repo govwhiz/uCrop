@@ -71,7 +71,7 @@ public class CropImageView extends TransformImageView {
     public void cropAndSaveImage(@NonNull Bitmap.CompressFormat compressFormat, int compressQuality,
                                  @Nullable BitmapCropCallback cropCallback) {
         cancelAllAnimations();
-        setImageToWrapCropBounds(false);
+//        setImageToWrapCropBounds(false);
 
         final ImageState imageState = new ImageState(
                 mCropRect, RectUtils.trapToRect(mCurrentImageCorners),
@@ -116,8 +116,8 @@ public class CropImageView extends TransformImageView {
         mTargetAspectRatio = cropRect.width() / cropRect.height();
         mCropRect.set(cropRect.left - getPaddingLeft(), cropRect.top - getPaddingTop(),
                 cropRect.right - getPaddingRight(), cropRect.bottom - getPaddingBottom());
-        calculateImageScaleBounds();
-        setImageToWrapCropBounds();
+//        calculateImageScaleBounds();
+//        setImageToWrapCropBounds();
     }
 
     /**

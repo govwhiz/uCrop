@@ -2,6 +2,8 @@ package com.yalantis.ucrop.task;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.RectF;
 import android.media.ExifInterface;
 import android.net.Uri;

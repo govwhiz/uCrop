@@ -90,7 +90,7 @@ public class GestureCropImageView extends CropImageView {
 //        if ((event.getAction() & MotionEvent.ACTION_MASK) == MotionEvent.ACTION_UP) {
 //
 //        }
-        setImageToWrapCropBounds(false);
+//        setImageToWrapCropBounds(false);
         return true;
     }
 

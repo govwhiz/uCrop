@@ -90,7 +90,8 @@ JNIEXPORT jboolean JNICALL Java_com_yalantis_ucrop_task_BitmapCropTask_cropCImg
             warp(x, y, 1) = h2 - u*sa + v*ca;
         }
 
-        img = img.get_warp(warp, 0, 1, 2);
+        //img = img.get_warp(warp, 0, 1, 2);
+        img = img.get_warp(warp, 0, 1, 0);
 
         if (format == SAVE_FORMAT_JPEG) {
             img.save_jpeg(file_result_path, quality);
